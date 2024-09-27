@@ -96,6 +96,9 @@ function getWeather(city) {
       const name = data.name;
 
       return `${name}: ${temp}°C, ${description}`;
+    })
+    .catch(error => {
+      dataOutput.textContent = `${error.message}`;
     });
 }
 
@@ -103,6 +106,8 @@ function handleWeatherRequest() {
   const cityName = cityInput.value.trim();
 
   if (cityName) {
+    dataOutput.textContent = 'Loading...';
+
     getWeather(cityName)
       .then(weather => {
         dataOutput.textContent = `${weather}`;
