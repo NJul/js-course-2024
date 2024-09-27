@@ -81,13 +81,23 @@ function createWeatherUI() {
 
 const { cityInput, getWeatherBtn } = createWeatherUI();
 
-function getWeather(city) {
+function showMessage(message) {
+  dataOutput.textContent = message;
+}
+
+function showError(cityName, error) {
+  showMessage(`Error: ${cityName || 'city'} - ${error}`);
+}
+
+function fetchWeatherData(city) {
   const apiKey = '05f1fe5c95b350a4fe31648442993255';
   const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric&lang=uk`;
 
   return fetch(apiUrl)
     .then(response => {
-      if (!response.ok) throw new Error('city not found');
+      if (!response.ok) {
+        throw new Error('city not found');
+      }
       return response.json();
     })
     .then(data => {
@@ -96,9 +106,6 @@ function getWeather(city) {
       const name = data.name;
 
       return `${name}: ${temp}°C, ${description}`;
-    })
-    .catch(error => {
-      dataOutput.textContent = `${error.message}`;
     });
 }
 
@@ -106,17 +113,13 @@ function handleWeatherRequest() {
   const cityName = cityInput.value.trim();
 
   if (cityName) {
-    dataOutput.textContent = 'Loading...';
+    showMessage('Loading...');
 
-    getWeather(cityName)
-      .then(weather => {
-        dataOutput.textContent = `${weather}`;
-      })
-      .catch(error => {
-        dataOutput.textContent = `Error: ${cityName} - ${error.message}`;
-      });
+    fetchWeatherData(cityName)
+      .then(weather => showMessage(weather))
+      .catch(error => showError(cityName, error.message));
   } else {
-    dataOutput.textContent = 'Please enter a city name';
+    showMessage('Please enter a city name');
   }
 
   cityInput.value = '';
